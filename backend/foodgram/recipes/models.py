@@ -42,7 +42,7 @@ class Recipe(models.Model):
         ordering = ['-pub_date']
 
     def count_favorited(self):
-        return Favorite.objects.filter(recipes__id=self.id).count()
+        return Favorite.objects.filter(recipe__id=self.id).count()
 
 
 class ShoppingCart(models.Model):

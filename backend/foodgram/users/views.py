@@ -13,8 +13,7 @@ class SubscriptionViewSet(mixins.CreateModelMixin,
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Subscription.objects.filter(user=user)
-        return queryset
+        return Subscription.objects.filter(user=user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
