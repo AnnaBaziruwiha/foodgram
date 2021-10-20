@@ -49,11 +49,13 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='shopping'
     )
-    recipes = models.ManyToManyField(Recipe)
+    ingredients = models.ManyToManyField(Ingredient)
 
 
 class Favorite(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='favorite'
     )
-    recipes = models.ManyToManyField(Recipe)
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='favorited'
+    )
