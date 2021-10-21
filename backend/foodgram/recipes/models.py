@@ -56,6 +56,4 @@ class Favorite(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='favorite'
     )
-    recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, related_name='favorited'
-    )
+    recipes = models.ManyToManyField(Recipe)
