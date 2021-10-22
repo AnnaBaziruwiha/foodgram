@@ -1,0 +1,9 @@
+POST http://127.0.0.1:8000/api/users/?username=user HTTP/1.1
+content-type: application/json
+
+{
+    "email": "user@ya.ru",
+    "first_name": "user",
+    "last_name": "user",
+    "password": "user100500"
+}

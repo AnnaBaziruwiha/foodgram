@@ -13,8 +13,3 @@ class IsOwner(permissions.BasePermission):
 class ReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.method == 'GET'
-
-
-class NoObjectPermission(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return False

@@ -1,13 +1,13 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
 from .filters import RecipeFilterSet
 from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
-from .permissions import IsOwner, NoObjectPermission, ReadOnly
+from .permissions import IsOwner, ReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer)
@@ -16,11 +16,15 @@ from .serializers import (FavoriteSerializer, IngredientSerializer,
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = [
-        (IsAuthenticatedOrReadOnly & NoObjectPermission) | IsAdminUser
-    ]
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilterSet
+
+    def get_permissions(self):
+        if self.action == 'update' or self.action == 'destroy':
+            permission_classes = [IsOwner | IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticatedOrReadOnly]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -29,7 +33,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = [IsAdminUser | IsOwner]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
 
 
 class TagViewSet(viewsets.ModelViewSet):

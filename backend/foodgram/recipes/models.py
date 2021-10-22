@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.html import format_html
 
-from users.models import User
+from users.models import CustomUser
 
 
 class Tag(models.Model):
@@ -25,7 +25,7 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='recipe'
+        CustomUser, on_delete=models.CASCADE, related_name='recipe'
     )
     ingredients = models.ManyToManyField(Ingredient)
     tags = models.ManyToManyField(Tag)
@@ -47,13 +47,13 @@ class Recipe(models.Model):
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='shopping'
+        CustomUser, on_delete=models.CASCADE, related_name='shopping'
     )
     ingredients = models.ManyToManyField(Ingredient)
 
 
 class Favorite(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='favorite'
+        CustomUser, on_delete=models.CASCADE, related_name='favorite'
     )
     recipes = models.ManyToManyField(Recipe)

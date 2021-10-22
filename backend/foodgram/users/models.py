@@ -1,13 +1,23 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-User = get_user_model()
+
+class CustomUser(AbstractUser):
+    username = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
+    first_name = models.CharField(max_length=100,)
+    last_name = models.CharField(max_length=100,)
+    password = models.CharField(max_length=200)
+
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
 
 class Subscription(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='followed'
+        CustomUser, on_delete=models.CASCADE, related_name='followed'
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='follows'
+        CustomUser, on_delete=models.CASCADE, related_name='follows'
     )

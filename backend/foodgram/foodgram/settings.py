@@ -75,6 +75,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -120,23 +122,24 @@ SIMPLE_JWT = {
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'USER_CREATE_PASSWORD_RETYPE': True,
+    # 'USER_CREATE_PASSWORD_RETYPE': True,
     'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'SEND_CONFIRMATION_EMAIL': True,
     'SET_USERNAME_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
+    'TOKEN_MODEL': None,
     'USERNAME_RESET_CONFIRM_URL': 'set_username/{uid}/{token}',
     'PASSWORD_RESET_CONFIRM_URL': 'set_password/{uid}/{token}',
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
-    'SERUALIZERS': {
-        'user_create': 'users.serializers.BaseUserRegistrationSerializer',
-        'user': 'djoser.serializers.UserSerializer',
-        'current_user': 'djoser.serializers.UserSerializer',
-        'user_delete': 'djoser.serializers.UserSerializer',
-    },
+    # 'SERUALIZERS': {
+        # 'user_create': 'users.serializers.UserSerializer',
+        # 'user': 'djoser.serializers.UserSerializer',
+        # 'current_user': 'djoser.serializers.UserSerializer',
+        # 'user_delete': 'djoser.serializers.UserSerializer',
+    # },
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
