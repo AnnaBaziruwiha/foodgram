@@ -4,8 +4,6 @@ import uuid
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from users.serializers import UserSerializer
-
 from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 
 
@@ -54,7 +52,11 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    author = UserSerializer()
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
     ingredients = IngredientSerializer(many=True)
     tags = TagSerializer(many=True)
     image = Base64ImageField()
@@ -63,6 +65,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ['id', 'name', 'ingredients', 'tags', 'author',
                   'image', 'text', 'cooking_time', 'pub_date']
+        optional_fields = ['tags', 'image']
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
@@ -79,7 +82,13 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+    recipes = RecipeSerializer(many=True)
 
     class Meta:
         model = Favorite
-        fields = ['user', 'recipe']
+        fields = ['user', 'recipes']
