@@ -21,6 +21,9 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(max_length=50)
     quantity = models.FloatField()
 
+    def __str__(self):
+        return self.name
+
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)

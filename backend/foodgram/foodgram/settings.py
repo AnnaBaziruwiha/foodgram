@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'djoser',
     'django_filters',
     'recipes',
@@ -115,31 +116,13 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT',),
+    'AUTH_HEADER_TYPES': ('Bearer',),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=999999),
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken')
 }
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    # 'USER_CREATE_PASSWORD_RETYPE': True,
-    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': True,
-    'SET_USERNAME_RETYPE': True,
-    'SET_PASSWORD_RETYPE': True,
     'TOKEN_MODEL': None,
-    'USERNAME_RESET_CONFIRM_URL': 'set_username/{uid}/{token}',
-    'PASSWORD_RESET_CONFIRM_URL': 'set_password/{uid}/{token}',
-    'ACTIVATION_URL': 'activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
-    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
-    # 'SERUALIZERS': {
-        # 'user_create': 'users.serializers.UserSerializer',
-        # 'user': 'djoser.serializers.UserSerializer',
-        # 'current_user': 'djoser.serializers.UserSerializer',
-        # 'user_delete': 'djoser.serializers.UserSerializer',
-    # },
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

@@ -1,25 +1,20 @@
-from djoser.serializers import UserCreateSerializer
+from django.contrib.auth.hashers import make_password
+from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from .models import Subscription, CustomUser
+from .models import CustomUser, Subscription
 
 
-class BaseUserRegistrationSerializer(UserCreateSerializer):
-
-    class Meta(UserCreateSerializer.Meta):
-        model = CustomUser
-        fields = [
-            'email', 'id', 'username', 'first_name', 'last_name', 'password'
-        ]
-
-
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(UserSerializer):
 
     class Meta:
         model = CustomUser
         fields = [
             'email', 'id', 'username', 'first_name', 'last_name',
         ]
+
+    def validate_password(self, value):
+        return make_password(value)
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

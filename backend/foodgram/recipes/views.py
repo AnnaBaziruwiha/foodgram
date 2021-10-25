@@ -62,10 +62,13 @@ class EditShoppingCartViewSet(viewsets.GenericViewSet,
 
 
 def download_shopping_cart(request):
-    shopping_cart = get_object_or_404(ShoppingCart, user=request.user)
-    ingredients = shopping_cart.ingredients.all()
-    # here i must create the file and then output it
-    return HttpResponse(content_type='application/pdf')
+    cart = get_object_or_404(ShoppingCart, user=request.user)
+    with open('shopping_cart.txt', 'w+') as cart_file:
+        for item in cart.ingredients.all():
+            cart_file.write(
+                f'{item.name} ({item.measurement_unit}) – {item.quantity}'
+            )
+    return HttpResponse(cart_file, content_type='text/plain')
 
 
 class FavoriteViewSet(viewsets.GenericViewSet,
@@ -77,4 +80,4 @@ class FavoriteViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
-        serializer.save(user=self.request.user, recipes=recipe.ingredients)
+        serializer.save(user=self.request.user, recipes=recipe)
