@@ -15,9 +15,15 @@ from .serializers import (FavoriteSerializer, IngredientSerializer,
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    serializers = {
+        'default': RecipeSerializer,
+        'create': RecipeCreateSerializer,
+    }
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilterSet
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers['default'])
 
     def get_permissions(self):
         if self.action == 'update' or self.action == 'destroy':
@@ -32,7 +38,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
+    serializers = {
+        'default': IngredientSerializer,
+        'create': IngredientCreateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers['default'])
 
     def get_permissions(self):
         if self.action == 'create':
@@ -58,11 +70,12 @@ class EditShoppingCartViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe_id'))
-        serializer.save(user=self.request.user, ingredients=recipe.ingredients)
+        serializer.save(user=self.request.user, recipe=recipe)
 
 
 def download_shopping_cart(request):
-    cart = get_object_or_404(ShoppingCart, user=request.user)
+    cart = ShoppingCart.objects.filter(user=request.user)
+    ingredients = cart.
     with open('shopping_cart.txt', 'w+') as cart_file:
         for item in cart.ingredients.all():
             cart_file.write(

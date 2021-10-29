@@ -1,19 +1,15 @@
+from django.core.validators import MinValueValidator
 from django.db import models
-from django.utils.html import format_html
 
 from users.models import CustomUser
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=200)
-    color = models.CharField(max_length=7, default='#ffffff')
+    color = models.CharField(
+        max_length=7, default='#ffffff'
+    )
     slug = models.SlugField(max_length=50)
-
-    def colored_name(self):
-        return format_html(
-            '<span style="color: #{};">{}</span>',
-            self.color
-        )
 
     def __str__(self):
         return self.name
@@ -22,10 +18,22 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(max_length=200)
     measurement_unit = models.CharField(max_length=50)
-    quantity = models.FloatField()
-
+    
     def __str__(self):
         return self.name
+
+
+class IngredientAmount(models.Model):
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, related_name='amount'
+    )
+    recipe = models.ForeignKey(
+        'Recipe', on_delete=models.CASCADE, related_name='amount'
+    )
+    amount = models.IntegerField(validators=[MinValueValidator(1)])
+
+    class Meta:
+        unique_together = ['ingredient', 'recipe']
 
 
 class Recipe(models.Model):
@@ -36,10 +44,10 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient)
     tags = models.ManyToManyField(Tag)
     image = models.ImageField(
-        verbose_name='Картинка', upload_to='recipes/', blank=True, null=True
+        verbose_name='Картинка', upload_to='media/', blank=True, null=True
     )
     text = models.TextField()
-    cooking_time = models.IntegerField()
+    cooking_time = models.IntegerField(validators=[MinValueValidator(1)])
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации', auto_now_add=True
     )
@@ -47,19 +55,26 @@ class Recipe(models.Model):
     class Meta:
         ordering = ['-pub_date']
 
-    def count_favorited(self):
-        return Favorite.objects.filter(recipes__id=self.id).count()
-
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='shopping'
     )
-    ingredients = models.ManyToManyField(Ingredient)
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='shopping_cart'
+    )
+
+    class Meta:
+        unique_together = ['user', 'recipe']
 
 
 class Favorite(models.Model):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='favorite'
     )
-    recipes = models.ManyToManyField(Recipe)
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='favorited'
+    )
+
+    class Meta:
+        unique_together = ['user', 'recipe']

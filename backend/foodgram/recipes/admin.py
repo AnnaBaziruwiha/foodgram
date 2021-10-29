@@ -5,17 +5,17 @@ from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'colored_name')
+    list_display = ('name', 'slug', 'color')
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author',)
     list_filter = ('author', 'name', 'tags')
-    readonly_fields = ('favorited_count',)
+#    readonly_fields = ('favorited_count',)
 
-    def favorited_count(self, obj):
-        return obj.count_favorited()
+#    def favorited_count(self, obj):
+#        return obj.count_favorited()
 
 
 @admin.register(Ingredient)
@@ -26,9 +26,9 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('user',)
+    list_display = ('user', 'recipe')
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ('user',)
+    list_display = ('user', 'recipe')

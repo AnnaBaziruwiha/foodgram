@@ -4,6 +4,8 @@ import uuid
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
+from users.serializers import CustomUserSerializer
+
 from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 
 
@@ -21,51 +23,68 @@ class Base64ImageField(serializers.ImageField):
 
 
 class TagSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Tag
         fields = ['id', 'name', 'color', 'slug']
 
-    def create(self, validated_data):
-        return Tag.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.color = validated_data.get('color', instance.color)
-        instance.slug = validated_data.get('slug', instance.slug)
-        instance.save()
-        return instance
-
-
-class IngredientSerializer(serializers.ModelSerializer):
+class IngredientCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ['id', 'name', 'measurement_unit']
 
-    def create(self, validated_data):
-        return Ingredient.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.measurement_unit = validated_data.get(
-            'measurement_unit', instance.measurement_unit
-        )
+class IngredientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ingredient
+        fields = ['id', 'amount']
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeCreateSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
     ingredients = IngredientSerializer(many=True)
-    tags = TagSerializer(many=True)
+    tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
-        fields = ['id', 'name', 'ingredients', 'tags', 'author',
-                  'image', 'text', 'cooking_time', 'pub_date']
+        fields = ['id', 'ingredients', 'tags', 'image', 'name',
+                  'text', 'cooking_time', 'author', 'pub_date']
         optional_fields = ['tags', 'image']
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    ingredients = IngredientSerializer(many=True)
+    tags = TagSerializer(many=True)
+    author = CustomUserSerializer(read_only=True)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+
+    def get_is_favorited(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return Favorite.objects.filter(
+            recipe_id=obj, user_id=request.user
+        ).exists()
+
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return ShoppingCart.objects.filter(
+            recipe_id=obj, user_id=request.user
+        ).exists()
+
+    class Meta:
+        model = Recipe
+        fields = ('__all__',)
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
@@ -74,11 +93,11 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    ingredients = IngredientSerializer(many=True)
+    recipe = RecipeSerializer()
 
     class Meta:
         model = ShoppingCart
-        fields = ['user', 'ingredients']
+        fields = ('__all__',)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -87,8 +106,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    recipes = RecipeSerializer(many=True)
+    recipe = RecipeSerializer()
 
     class Meta:
         model = Favorite
-        fields = ['user', 'recipes']
+        fields = ('__all__',)
