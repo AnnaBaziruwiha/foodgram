@@ -1,7 +1,6 @@
-POST http://127.0.0.1:8000/api/token/create/ HTTP/1.1
+GET http://127.0.0.1:8000/api/recipes/ HTTP/1.1
 content-type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjk1NTE2ODg1LCJqdGkiOiJlNjdiNjczNzE5MGI0OGQ4YWVkZmU3MDYwODViZTlkNyIsInVzZXJfaWQiOjJ9.Hy9KruEvu5aHYPY-zA-c-u9h-7HeqbfAkT-2wm8nCI0
 
 {
-    "email": "user@ya.ru",
-    "password": "user100500"
 }
