@@ -24,22 +24,22 @@ class Ingredient(models.Model):
 
 
 class IngredientAmount(models.Model):
-    item = models.ForeignKey(
-        Ingredient, on_delete=models.CASCADE, related_name='amount'
+    name = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, related_name='ingredient_amount'
     )
     recipe = models.ForeignKey(
-        'Recipe', on_delete=models.CASCADE, related_name='amount'
+        'Recipe', on_delete=models.CASCADE, related_name='ingredient_amount'
     )
     amount = models.IntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
-        unique_together = ['item', 'recipe']
+        unique_together = ['name', 'recipe']
 
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='recipe'
+        CustomUser, on_delete=models.CASCADE, related_name='recipes'
     )
     ingredients = models.ManyToManyField(Ingredient)
     tags = models.ManyToManyField(Tag)
@@ -61,7 +61,7 @@ class Recipe(models.Model):
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='shopping'
+        CustomUser, on_delete=models.CASCADE, related_name='shopping_cart'
     )
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, related_name='shopping_cart'
@@ -76,7 +76,7 @@ class Favorite(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='favorite'
     )
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, related_name='favorited'
+        Recipe, on_delete=models.CASCADE, related_name='favorite'
     )
 
     class Meta:

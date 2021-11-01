@@ -9,16 +9,15 @@ from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
 from .filters import RecipeFilterSet
 from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsOwner, ReadOnly
-from .serializers import (FavoriteSerializer, IngredientCreateSerializer, IngredientListSerializer,
-                          IngredientAmountSerializer, RecipeCreateSerializer,
-                          RecipeSerializer, ShoppingCartSerializer,
-                          TagSerializer)
+from .serializers import (FavoriteSerializer, IngredientListSerializer,
+                          RecipeCreateSerializer, RecipeListSerializer,
+                          ShoppingCartSerializer, TagSerializer)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializers = {
-        'default': RecipeSerializer,
+        'default': RecipeListSerializer,
         'create': RecipeCreateSerializer,
     }
     filter_backends = (DjangoFilterBackend,)
@@ -40,12 +39,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
-    serializers = {
-        'default': IngredientAmountSerializer,
-        'create': IngredientCreateSerializer,
-        'list': IngredientListSerializer,
-        'retrieve':IngredientListSerializer,
-    }
+    serializers = IngredientListSerializer()
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['default'])

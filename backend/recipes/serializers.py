@@ -2,11 +2,13 @@ import base64
 import uuid
 
 from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from users.serializers import CustomUserSerializer
 
-from .models import Favorite,IngredientAmount, Ingredient,  Recipe, ShoppingCart, Tag
+from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
 
 
 class Base64ImageField(serializers.ImageField):
@@ -29,25 +31,35 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'color', 'slug']
 
 
-class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    amount = serializers.IntegerField()
-    class Meta:
-        model = IngredientAmount
-        fields = ['id', 'amount']
-
-class IngredientListSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(read_only=True)
-    measurement_unit = serializers.CharField(read_only=True)
-    amount = serializers.IntegerField()
-
-
-class IngredientCreateSerializer(serializers.ModelSerializer):
+class IngredientListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = '__all__'
+        fields = ['id', 'name', 'measurement_unit']
+
+
+class IngredientRecipeSerializer(serializers.ModelSerializer):
+    amount = serializers.SerializerMethodField()
+
+    def get_amount(self, obj):
+        ingredient = get_object_or_404(IngredientAmount, name=obj.name)
+        return ingredient.amount
+
+    class Meta:
+        model = Ingredient
+        fields = ['id', 'name', 'measurement_unit', 'amount']
+
+
+class IngredientRecipeCreateSerializer(serializers.ModelSerializer):
+    amount = serializers.SerializerMethodField()
+
+    def get_amount(self, obj):
+        ingredient = get_object_or_404(IngredientAmount, name=obj.name)
+        return ingredient.amount
+
+    class Meta:
+        model = Ingredient
+        fields = ['id', 'amount']
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -56,7 +68,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    ingredients = IngredientAmountSerializer(many=True)
+    ingredients = IngredientRecipeCreateSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     image = Base64ImageField()
 
@@ -64,11 +76,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ['id', 'ingredients', 'tags', 'image', 'name',
                   'text', 'cooking_time', 'author', 'pub_date']
-        optional_fields = ['tags', 'image']
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-    ingredients = IngredientAmountSerializer(many=True)
+class RecipeListSerializer(serializers.ModelSerializer):
+    ingredients = IngredientRecipeSerializer(many=True)
     tags = TagSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
@@ -78,13 +89,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Favorite.objects.filter(recipe_id=obj, user_id=request.user).exists()
+        return Favorite.objects.filter(
+            recipe_id=obj, user_id=request.user
+        ).exists()
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return ShoppingCart.objects.filter(recipe_id=obj, user_id=request.user).exists()
+        return ShoppingCart.objects.filter(
+            recipe_id=obj, user_id=request.user
+        ).exists()
 
     class Meta:
         model = Recipe
@@ -93,13 +108,20 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_favorited', 'is_in_shopping_cart']
 
 
+class RecipeShortSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'name', 'image', 'cooking_time']
+
+
 class ShoppingCartSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    recipe = RecipeSerializer()
+    recipe = RecipeShortSerializer()
 
     class Meta:
         model = ShoppingCart
@@ -112,7 +134,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    recipe = RecipeSerializer()
+    recipe = RecipeShortSerializer()
 
     class Meta:
         model = Favorite
