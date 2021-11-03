@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,7 +7,7 @@ SECRET_KEY = 'django-insecure-(#c&hk6^g$i5!gc85)e^5z&sq+f#dy_m40=s1fvrf=ryh(o1y4
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'db', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -126,14 +125,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 }
 
-SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=999999),
-}
-
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'TOKEN_MODEL': None,
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

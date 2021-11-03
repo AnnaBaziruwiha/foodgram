@@ -1,7 +1,25 @@
+from django.core.validators import ValidationError, validate_email
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
 from .models import CustomUser, Subscription
+
+
+class TokenSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            validate_email(value)
+            return value
+
+        except ValidationError:
+            return None
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'password']
 
 
 class CustomUserSerializer(UserSerializer):
