@@ -1,5 +1,6 @@
-POST http://127.0.0.1:8000/api/auth/token/login/ HTTP/1.1
+POST http://127.0.0.1:8000/api/recipes/ HTTP/1.1
 content-type: application/json
+Authorization: Token df27adccb5367e2f92d47d89cf71c826ac7e719e
 
 {
     "username": "yuri",
