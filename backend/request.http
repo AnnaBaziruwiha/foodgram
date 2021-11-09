@@ -3,10 +3,19 @@ content-type: application/json
 Authorization: Token df27adccb5367e2f92d47d89cf71c826ac7e719e
 
 {
-    "username": "yuri",
-    "email": "yuri@ya.ru",
-    "first_name": "yuri",
-    "last_name": "gagarin",
-    "password": "yuri100500"
+    "ingredients": [{}],
+    "tags": [],
+    "image": "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
+    "name": "sample_recipe",
+    "text": "sample_recipe",
+    "cooking_time": 3
 
+}
+
+###
+
+GET http://127.0.0.1:8000/api/recipes/1/favorite/ HTTP/1.1
+content-type: application/json
+
+{
 }

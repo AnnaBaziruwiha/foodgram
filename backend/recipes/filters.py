@@ -1,18 +1,31 @@
-from django_filters.rest_framework import FilterSet, filters
-from django_filters.widgets import CSVWidget
+from django_filters import rest_framework as filters
 
-from .models import Recipe
+from .models import Ingredient, Recipe
 
 
-class RecipeFilterSet(FilterSet):
-    tags = filters.CharFilter(
-        distinct=True, widget=CSVWidget, method='filter_tags'
-    )
-    name = filters.CharFilter()
+class RecipeFilterSet(filters.FilterSet):
+    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
+    is_in_shopping_cart = filters.BooleanFilter(method='get_shopping_cart')
+    is_favorited = filters.BooleanFilter(method='get_favorite')
+
+    def get_shopping_cart(self, queryset, name, value):
+        if value:
+            return Recipe.objects.filter(shopping_cart__user=self.request.user)
+        return Recipe.objects.all()
+
+    def get_favorite(self, queryset, name, value):
+        if value:
+            return Recipe.objects.filter(favorite__user=self.request.user)
+        return Recipe.objects.all()
 
     class Meta:
         model = Recipe
-        fields = ['name', 'tags']
+        fields = ['tags', 'author', 'is_favorited', 'is_in_shopping_cart']
 
-    def filter_tags(self, queryset, name, value):
-        return queryset.filter(tags__name__in=value)
+
+class IngredientFilterSet(filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Ingredient
+        fields = ['name']

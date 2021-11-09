@@ -134,3 +134,6 @@ dmypy.json
 
 # images
 *.jpg
+
+# http requests
+*.http

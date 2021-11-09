@@ -10,18 +10,18 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author',)
+    list_display = ('name', 'author', 'favorited_count')
     list_filter = ('author', 'name', 'tags')
-#    readonly_fields = ('favorited_count',)
 
-#    def favorited_count(self, obj):
-#        return obj.count_favorited()
+    def favorited_count(self, obj):
+        return obj.favorite.all().count()
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit',)
     list_filter = ('name',)
+    search_fields = ('name',)
 
 
 @admin.register(ShoppingCart)

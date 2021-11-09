@@ -5,19 +5,33 @@ from users.models import CustomUser
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(verbose_name='Тэг', unique=True,
+                            null=False, blank=False, max_length=200)
     color = models.CharField(
+        unique=True, null=False, blank=False,
         max_length=7, default='#ffffff'
     )
-    slug = models.SlugField(max_length=50)
+    slug = models.SlugField(
+        max_length=50, unique=True,
+        null=False, blank=False
+    )
 
     def __str__(self):
         return self.name
 
 
+class RecipeTag(models.Model):
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+
 class Ingredient(models.Model):
-    name = models.CharField(max_length=200)
-    measurement_unit = models.CharField(max_length=50)
+    name = models.CharField(
+        verbose_name='Название ингредиента', max_length=200
+    )
+    measurement_unit = models.CharField(
+        verbose_name='Единицы измерения', max_length=50
+    )
 
     def __str__(self):
         return self.name
@@ -30,24 +44,30 @@ class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
         'Recipe', on_delete=models.CASCADE, related_name='ingredient_amount'
     )
-    amount = models.IntegerField(validators=[MinValueValidator(1)])
+    amount = models.IntegerField(
+        verbose_name='Количество', validators=[MinValueValidator(1)]
+    )
 
     class Meta:
         unique_together = ['name', 'recipe']
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(verbose_name='Название рецепта', max_length=200)
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='recipes'
     )
-    ingredients = models.ManyToManyField(Ingredient)
-    tags = models.ManyToManyField(Tag)
+    ingredients = models.ManyToManyField(
+        Ingredient, through='IngredientAmount'
+    )
+    tags = models.ManyToManyField(Tag, through='RecipeTag')
     image = models.ImageField(
         verbose_name='Картинка', upload_to='media/', blank=True, null=True
     )
-    text = models.TextField()
-    cooking_time = models.IntegerField(validators=[MinValueValidator(1)])
+    text = models.TextField(verbose_name='Текст рецепта')
+    cooking_time = models.IntegerField(
+        verbose_name='Время приготовления', validators=[MinValueValidator(1)]
+    )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации', auto_now_add=True
     )

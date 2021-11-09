@@ -1,62 +1,43 @@
-from django.contrib.auth.tokens import default_token_generator
-from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, mixins, viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import generics, status
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser, Subscription
-from .serializers import (CustomUserSerializer, SubscriptionSerializer,
-                          TokenSerializer)
+from .serializers import CustomUserListSerializer, SubscriptionSerializer
 
 
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'token': str(refresh.access_token),
-    }
+class SubscriptionAPIView(APIView):
+    permission_classes = [IsAuthenticated, ]
 
-
-class APIGetToken(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = TokenSerializer(data=request.data)
+    def get(self, request, id):
+        data = {
+            'user': request.user.id,
+            'author': id
+        }
+        serializer = SubscriptionSerializer(
+            data=data, context={'request': request}
+        )
         serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(
-            CustomUser, email=serializer.validated_data['email']
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, id):
+        author = get_object_or_404(CustomUser, id=id)
+        subscription = get_object_or_404(
+            Subscription, user=request.user, author=author
         )
-        if default_token_generator.check_token(
-            user, serializer.validated_data['password']
-        ):
-            return Response(get_tokens_for_user(user))
-        return Response(
-            {'password': "password doesn't match"}
-        )
-
-
-class SubscriptionViewSet(mixins.CreateModelMixin,
-                          mixins.ListModelMixin,
-                          viewsets.GenericViewSet):
-    serializer_class = SubscriptionSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        return Subscription.objects.filter(user=user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CustomUserListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = CustomUserSerializer
+    serializer_class = CustomUserListSerializer
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        subquery = Subscription.objects.filter(
-            user=self.request.user, author=OuterRef('id')
-        )
-        return CustomUser.objects.annotate(is_subscribed=Exists(subquery))
+        user = self.request.user
+        return CustomUser.objects.filter(followed__user=user)

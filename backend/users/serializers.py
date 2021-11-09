@@ -1,25 +1,10 @@
-from django.core.validators import ValidationError, validate_email
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
+
+from recipes.models import Recipe
 
 from .models import CustomUser, Subscription
-
-
-class TokenSerializer(serializers.ModelSerializer):
-
-    email = serializers.EmailField()
-
-    def validate_email(self, value):
-        try:
-            validate_email(value)
-            return value
-
-        except ValidationError:
-            return None
-
-    class Meta:
-        model = CustomUser
-        fields = ['email', 'password']
 
 
 class CustomUserSerializer(UserSerializer):
@@ -41,8 +26,24 @@ class CustomUserSerializer(UserSerializer):
         ]
 
 
+class CustomUserRecipeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'name', 'image', 'cooking_time']
+
+
 class CustomUserListSerializer(CustomUserSerializer):
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        recipes = obj.recipes.all()
+        context = {'request': request}
+        return CustomUserRecipeSerializer(
+            recipes, many=True, context=context
+        ).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -55,13 +56,25 @@ class CustomUserListSerializer(CustomUserSerializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all()
     )
-    author = CustomUserListSerializer()
+    author = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all()
+    )
 
     class Meta:
         model = Subscription
         fields = ['author', 'user']
+        validators = [
+            UniqueTogetherValidator(
+                queryset=CustomUser.objects.all,
+                fields=['author', 'user'])
+        ]
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return CustomUserListSerializer(
+            instance.author, context=context
+        ).data

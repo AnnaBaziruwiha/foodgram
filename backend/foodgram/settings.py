@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-(#c&hk6^g$i5!gc85)e^5z&sq+f#dy_m40=s1fvrf=ryh(o1y4
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend:8000']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -119,9 +119,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DATETIME_FORMAT': '%Y.%m.%dT%H:%M:%SZ',
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
 }
 
