@@ -6,11 +6,17 @@
 Развернутый проект можно посмотреть [здесь]()
 
 ### Технологии
+
 Python 3.9.0
+
 Django 3.2.8
+
 gunicorn 20.0.4
+
 djoser 2.1.0
+
 nginx 1.19.3
+
 postgres 12.4
 
 ### Ресурсы
@@ -49,10 +55,6 @@ docker-compose exec web python manage.py collectstatic
 ```sh
 docker-compose exec web python manage.py migrate
 ```
-- Создайте суперпользователя
-```sh
-docker-compose exec web python manage.py createsuperuser
-```
 - Заполните базу начальными данными
 ```sh
 docker-compose exec web python manage.py shell
@@ -62,7 +64,10 @@ docker-compose exec web python manage.py shell
 
 docker-compose exec web python manage.py loaddata fixtures.json
 ```
-
+- Создайте суперпользователя
+```sh
+docker-compose exec web python manage.py createsuperuser
+```
 ### Контакты
 Еще больше моих проектов ищите [тут](https://github.com/AnnaBaziruwiha)
 
