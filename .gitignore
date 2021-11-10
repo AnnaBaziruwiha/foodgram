@@ -137,3 +137,6 @@ dmypy.json
 
 # http requests
 *.http
+
+# vscode settings
+.vscode/
