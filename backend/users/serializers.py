@@ -1,8 +1,7 @@
 from djoser.serializers import UserSerializer
+from recipes.models import Recipe
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
-from recipes.models import Recipe
 
 from .models import CustomUser, Subscription
 
@@ -68,7 +67,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         fields = ['author', 'user']
         validators = [
             UniqueTogetherValidator(
-                queryset=CustomUser.objects.all,
+                queryset=Subscription.objects.all(),
                 fields=['author', 'user'])
         ]
 

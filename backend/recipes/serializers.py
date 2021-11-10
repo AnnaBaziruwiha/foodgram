@@ -2,7 +2,6 @@ from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
 from users.models import CustomUser
 from users.serializers import CustomUserSerializer
 
@@ -93,6 +92,34 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ['id', 'ingredients', 'tags', 'image', 'name',
                   'text', 'cooking_time', 'author', 'pub_date']
 
+    def validate_cooking_time(self, value):
+        if not isinstance(value, int):
+            raise serializers.ValidationError(
+                'Время приготовления должно быть целым числом'
+            )
+        if value < 1:
+            raise serializers.ValidationError(
+                'Время приготовления не может быть отрицательным'
+            )
+        return value
+
+    def validate_ingredients(self, value):
+        ingredients = self.initial_data.get('ingredients')
+        if ingredients == []:
+            raise serializers.ValidationError('Не указаны ингредиенты')
+        for ingredient in ingredients:
+            if int(ingredient['amount']) <= 0:
+                raise serializers.ValidationError(
+                    'Количество не может быть отрицательным'
+                )
+        return value
+
+    def validate_tags(self, value):
+        tags = self.initial_data.get('tags')
+        if len(tags) > len(set(tags)):
+            raise serializers.ValidationError('Теги не должны повторяться')
+        return value
+
     def to_representation(self, instance):
         serializer = RecipeListSerializer(instance)
         return serializer.data
@@ -119,12 +146,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        recipe.name = validated_data.get('name', recipe.name)
-        recipe.text = validated_data.get('text', recipe.text)
-        recipe.cooking_time = validated_data.get(
-            'cooking_time', recipe.cooking_time
-        )
-        recipe.image = validated_data.get('image', recipe.image)
         if 'ingredients' in self.initial_data:
             ingredients = validated_data.pop('ingredients')
             recipe.ingredients.clear()
@@ -132,8 +153,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if 'tags' in self.initial_data:
             tags_data = validated_data.pop('tags')
             recipe.tags.set(tags_data)
-        recipe.save()
-        return recipe
+        return super().update(recipe, validated_data)
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):

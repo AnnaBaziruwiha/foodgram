@@ -1,11 +1,12 @@
-import os
 from pathlib import Path
+
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend']
 
@@ -56,12 +57,12 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': os.getenv('DB_NAME', default='foodgram'),
-        'USER': os.getenv('POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='oktoberfest'),
-        'HOST': os.getenv('DB_HOST', default=''),
-        'PORT': os.getenv('DB_PORT', default='5432')
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DB_NAME', default='foodgram'),
+        'USER': config('POSTGRES_USER', default='postgres'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default='oktoberfest'),
+        'HOST': config('DB_HOST', default=''),
+        'PORT': config('DB_PORT', default='5432')
     }
 }
 

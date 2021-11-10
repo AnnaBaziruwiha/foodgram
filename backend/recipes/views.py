@@ -8,12 +8,12 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from .filters import IngredientFilterSet, RecipeFilterSet
-from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                     ShoppingCart, Tag)
+from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsAuthor, IsOwner
 from .serializers import (FavoriteSerializer, IngredientListSerializer,
                           RecipeCreateSerializer, RecipeListSerializer,
                           ShoppingCartSerializer, TagSerializer)
+from .utils import get_shopping_list
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -78,40 +78,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = request.user
-        queryset = user.shopping_cart.all()
-        shopping_data = get_shopping_data(queryset)
-        shopping_list = make_shopping_list(shopping_data)
+        shopping_list = get_shopping_list(user)
         response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="shopping.txt"'
         return response
-
-
-def get_shopping_data(queryset):
-    shopping_dict = {}
-    for item in queryset:
-        ingredients = IngredientAmount.objects.filter(recipe=item.recipe)
-        for ingredient in ingredients:
-            name = ingredient.name.name
-            measurement_unit = ingredient.name.measurement_unit
-            amount = ingredient.amount
-            if name not in shopping_dict:
-                shopping_dict[name] = {
-                    'measurement_unit': measurement_unit,
-                    'amount': amount
-                }
-            else:
-                shopping_dict[name]['amount'] += amount
-    return shopping_dict
-
-
-def make_shopping_list(shopping_data):
-    shopping_list = []
-    for key in shopping_data.keys():
-        measurement_unit = shopping_data[key]['measurement_unit']
-        amount = shopping_data[key]['amount']
-        line = str(key) + ' (' + measurement_unit + ') - ' + str(amount) + '\n'
-        shopping_list.append(line)
-    return shopping_list
 
 
 class IngredientViewSet(viewsets.GenericViewSet,
