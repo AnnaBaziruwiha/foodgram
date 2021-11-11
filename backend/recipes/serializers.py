@@ -2,9 +2,9 @@ from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
 from users.models import CustomUser
 from users.serializers import CustomUserSerializer
-
 from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
                      ShoppingCart, Tag)
 
@@ -93,10 +93,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                   'text', 'cooking_time', 'author', 'pub_date']
 
     def validate_cooking_time(self, value):
-        if not isinstance(value, int):
-            raise serializers.ValidationError(
-                'Время приготовления должно быть целым числом'
-            )
         if value < 1:
             raise serializers.ValidationError(
                 'Время приготовления не может быть отрицательным'
@@ -105,13 +101,20 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, value):
         ingredients = self.initial_data.get('ingredients')
-        if ingredients == []:
+        unique_ingredients = []
+        if not ingredients:
             raise serializers.ValidationError('Не указаны ингредиенты')
         for ingredient in ingredients:
             if int(ingredient['amount']) <= 0:
                 raise serializers.ValidationError(
                     'Количество не может быть отрицательным'
                 )
+            if ingredient['id'] in unique_ingredients:
+                raise serializers.ValidationError(
+                    'Ингредиенты должны быть уникальными'
+                )
+            else:
+                unique_ingredients.append(ingredient['id'])
         return value
 
     def validate_tags(self, value):

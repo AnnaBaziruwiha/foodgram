@@ -7,17 +7,17 @@
 
 ### Технологии
 
-Python 3.9.0
+- Python 3.9.0
 
-Django 3.2.8
+- Django 3.2.8
 
-gunicorn 20.0.4
+- gunicorn 20.0.4
 
-djoser 2.1.0
+- djoser 2.1.0
 
-nginx 1.19.3
+- nginx 1.19.3
 
-postgres 12.4
+- postgres 12.4
 
 ### Ресурсы
 
