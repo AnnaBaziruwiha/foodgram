@@ -8,7 +8,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend'
+                 'abzrwh.co.vu', '51.250.24.94']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,12 +58,12 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DB_NAME', default='foodgram'),
-        'USER': config('POSTGRES_USER', default='postgres'),
-        'PASSWORD': config('POSTGRES_PASSWORD', default='oktoberfest'),
-        'HOST': config('DB_HOST', default=''),
-        'PORT': config('DB_PORT', default='5432')
+        'ENGINE': config('DB_ENGINE'),
+        'NAME': config('DB_NAME'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT')
     }
 }
 
