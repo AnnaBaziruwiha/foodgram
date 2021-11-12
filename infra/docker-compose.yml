@@ -13,7 +13,9 @@ services:
     env_file:
       - ./.env
   backend:
-    image: abzrwh/foodgram:latest
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/backend/static/
