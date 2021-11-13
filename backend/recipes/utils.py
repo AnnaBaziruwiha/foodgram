@@ -30,5 +30,4 @@ def make_shopping_list(shopping_data):
 
 def get_shopping_list(user):
     shopping_data = get_shopping_data(user)
-    shopping_list = make_shopping_list(shopping_data)
-    return shopping_list
+    return make_shopping_list(shopping_data)

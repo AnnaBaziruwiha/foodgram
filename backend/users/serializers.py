@@ -1,10 +1,9 @@
 from djoser.serializers import UserSerializer
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from recipes.models import Recipe
 from .models import CustomUser, Subscription
+from recipes.models import Recipe
 
 
 class CustomUserSerializer(UserSerializer):
