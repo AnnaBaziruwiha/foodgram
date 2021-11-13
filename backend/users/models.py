@@ -13,6 +13,10 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
 
 class Subscription(models.Model):
     author = models.ForeignKey(
@@ -29,3 +33,5 @@ class Subscription(models.Model):
                 name='unique_subscription'
             )
         ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'

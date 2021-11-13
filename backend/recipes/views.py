@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
@@ -22,7 +21,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthor | IsAdminUser]
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = RecipeFilterSet
-    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

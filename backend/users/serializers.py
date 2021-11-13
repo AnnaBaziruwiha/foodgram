@@ -39,7 +39,10 @@ class CustomUserListSerializer(CustomUserSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get('request')
+        recipes_limit = request.query_params.get('recipes_limit')
         recipes = obj.recipes.all()
+        if recipes_limit:
+            recipes = recipes[:(int(recipes_limit))]
         context = {'request': request}
         return CustomUserRecipeSerializer(
             recipes, many=True, context=context

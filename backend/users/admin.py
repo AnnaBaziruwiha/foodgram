@@ -6,7 +6,7 @@ from .models import CustomUser, Subscription
 @admin.register(CustomUser)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'email', 'username', 'first_name', 'last_name')
-    list_filter = ('username', 'last_name')
+    list_filter = ('email', 'first_name')
 
 
 @admin.register(Subscription)
