@@ -14,7 +14,7 @@ services:
       - ./.env
   backend:
     build:
-      context: ../frontend
+      context: ../backend
       dockerfile: Dockerfile
     restart: always
     volumes:
