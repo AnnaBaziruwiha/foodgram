@@ -4,14 +4,14 @@ from .models import Ingredient, Recipe, Tag
 
 
 class RecipeFilterSet(filters.FilterSet):
+    is_in_shopping_cart = filters.BooleanFilter(method='get_shopping_cart')
+    is_favorited = filters.BooleanFilter(method='get_favorite')
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
         lookup_expr='contains',
         queryset=Tag.objects.all()
     )
-    is_in_shopping_cart = filters.BooleanFilter(method='get_shopping_cart')
-    is_favorited = filters.BooleanFilter(method='get_favorite')
 
     def get_shopping_cart(self, queryset, name, value):
         if value:
@@ -25,7 +25,7 @@ class RecipeFilterSet(filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ['tags', 'author', 'is_favorited', 'is_in_shopping_cart']
+        fields = ['author', 'is_favorited', 'is_in_shopping_cart', 'tags']
 
 
 class IngredientFilterSet(filters.FilterSet):
