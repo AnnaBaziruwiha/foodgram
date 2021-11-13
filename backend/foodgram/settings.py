@@ -121,9 +121,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'foodgram.pagination.CustomPageNumberPaginator',
     'DATETIME_FORMAT': '%Y.%m.%dT%H:%M:%SZ',
-    'PAGE_SIZE': 6,
 }
 
 DJOSER = {
