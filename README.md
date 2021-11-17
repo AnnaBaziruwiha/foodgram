@@ -5,11 +5,6 @@
 
 Развернутый проект можно посмотреть [здесь](http://abzrwh.co.vu/)
 
-Данные админа:
-
-- email: admin_user@ya.ru
-- password: gastronom
-
 ### Технологии
 
 - Python 3.9.0
