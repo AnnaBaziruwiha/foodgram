@@ -1,11 +1,10 @@
-# foodgram - продуктовый помощник
+# foodgram - groceries assistant
 
-### Описание
-Проект "foodgram - продуктовый помощник" позволяет пользователям публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
+### Description
+This project currently only supports Russian language.
+The "foodgram" project helps its users to publish recipes, subscribe to other users' publications, add recipes to favorites(«Избранное»), and download the shopping list that contains all the ingredients from the favorited recipes.
 
-Развернутый проект можно посмотреть [здесь](http://abzrwh.co.vu/)
-
-### Технологии
+### Technologies
 
 - Python 3.9.0
 
@@ -19,22 +18,22 @@
 
 - postgres 12.4
 
-### Ресурсы
+### Resources
 
-**users**: пользователи
+**users**
 
-**recipes**: рецепты
+**recipes**
 
-**ingredients**: ингредиенты
+**ingredients**
 
-**tags**: теги
+**tags**
 
-**subscriptions**: подписки
+**subscriptions**
 
-**shopping_cart**: список покупок
+**shopping_cart**
 
-### Запуск проекта в dev-режиме
-- Создайте в корне проекта файл .env и пропишите в нем следующие переменные окружения:
+### Deploy the project in developer mode
+- Create the .env file in the root of the project and fill it with the following data:
 ```sh
 DB_ENGINE # укажите, какая подсистема хранения будет использоваться
 DB_NAME # имя базы данных
@@ -43,19 +42,19 @@ POSTGRES_PASSWORD # пароль для подключения к базе да�
 DB_HOST # название сервиса
 DB_PORT # порт для подключения к базе данных
 ```
-- Находясь в директории проекта, запустите docker-compose:
+- Run docker-compose in the project's directory:
 ```sh
 docker-compose up -d --build
 ```
-- Соберите статику проекта в папку static
+- Collect the project's static files in the static folder
 ```sh
 docker-compose exec web python manage.py collectstatic
 ```
-- Выполните миграции:
+- Make migrations:
 ```sh
 docker-compose exec web python manage.py migrate
 ```
-- Заполните базу начальными данными
+- Fill the database with initial data
 ```sh
 docker-compose exec web python manage.py shell
 >>> from django.contrib.contentfiles.models import ContentFile
@@ -64,14 +63,14 @@ docker-compose exec web python manage.py shell
 
 docker-compose exec web python manage.py loaddata fixtures.json
 ```
-- Создайте суперпользователя
+- Create a superuser
 ```sh
 docker-compose exec web python manage.py createsuperuser
 ```
-### Контакты
-Еще больше моих проектов ищите [тут](https://github.com/AnnaBaziruwiha)
+### Contacts
+Check out more of my projects [here](https://github.com/AnnaBaziruwiha)
 
-Предложения и пожелания пишите [сюда](abaziruwiha@gmail.com)
+You can send suggestions and requests to [this address](abaziruwiha@gmail.com)
 
-Мой [linkedin](https://www.linkedin.com/in/annabaziruwiha/)
+My [linkedin](https://www.linkedin.com/in/annabaziruwiha/)
 
